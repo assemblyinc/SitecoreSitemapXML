@@ -2,7 +2,6 @@
 
 using System;
 using Sitecore;
-using Sitecore.Caching;
 using Sitecore.Diagnostics;
 using Sitecore.Pipelines.HttpRequest;
 using Sitemap.XML.Models;
