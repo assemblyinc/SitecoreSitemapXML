@@ -33,6 +33,8 @@ namespace Sitemap.XML
             public static string ExcludedItemsFieldName = "Excluded Items";
             public static string FileNameFieldName = "File Name";
             public static string ServerUrlFieldName = "Server Url";
+            public static string EnabledLanguagesFieldName = "Enabled Languages";
+            public static string UseDisplayNameFieldName = "Use Display Name";
             public static string CleanupBucketPath = "Cleanup Bucket Path";
 	        public static string SitemapNameForRobots = "Sitemap name for Robots";
         }

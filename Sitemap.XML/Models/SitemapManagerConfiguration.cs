@@ -19,19 +19,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-using System.Runtime.InteropServices;
 using System.Web;
 using System.Xml;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Xml;
-using System.Collections.Specialized;
 using Sitecore.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using Sitecore;
-using Sitecore.Sites;
 
 namespace Sitemap.XML.Models
 {
@@ -49,41 +46,26 @@ namespace Sitemap.XML.Models
             SiteName = siteName;
         }
 
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
 
-		public static string SitesMultilingual
-		{
-			get
-			{
-				return GetValueByName("sitesMultilingual");
-			}
-		}
-
-		public static string XmlnsTpl
+        public static bool IncludeLastModInXml
         {
             get
             {
-                return GetValueByName("xmlnsTpl");
+                var includeLastModInXml = GetValueByName("includeLastModInXml");
+                return !string.IsNullOrWhiteSpace(includeLastModInXml) && (includeLastModInXml.ToLower() == "true" || includeLastModInXml == "1");
             }
         }
 
-	    public static string XmlnsXhtmlTpl
-		{
-		    get
-		    {
-			    return GetValueByName("xmlnsXhtmlTpl");
-		    }
-	    }
+        public List<string> EnabledLanguageList => !string.IsNullOrWhiteSpace(EnabledLanguages) ? EnabledLanguages.Split('|').ToList() : null;
 
-		public static string WorkingDatabase
-        {
-            get
-            {
-                return GetValueByName("database");
-            }
-        }
+        public static string XmlnsTpl => GetValueByName("xmlnsTpl");
+
+        public static string XmlnsXhtmlTpl => GetValueByName("xmlnsXhtmlTpl");
+
+        public static string WorkingDatabase => GetValueByName("database");
 
         public string SitemapConfigurationItemPath
         {
@@ -92,8 +74,8 @@ namespace Sitemap.XML.Models
                 var site = Factory.GetSite(SiteName); // GetSite(SiteName);
                 var sitemapPath = site.Properties["sitemapPath"];
                 if (string.IsNullOrWhiteSpace(sitemapPath))
-                { 
-                    return StringUtil.EnsurePostfix('/', GetValueByName("sitemapConfigurationItemPath")) + SiteName;
+                {
+                    return GetValueByName("sitemapConfigurationItemPath") + SiteName;
                 }
                 else
                 {
@@ -138,13 +120,17 @@ namespace Sitemap.XML.Models
         public string SiteName { get; } = string.Empty;
 
         public string FileName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.FileNameFieldName);
-	    public string SitemapNameForRobots => GetValueByNameFromDatabase(Constants.WebsiteDefinition.SitemapNameForRobots);
+        public string SitemapNameForRobots => GetValueByNameFromDatabase(Constants.WebsiteDefinition.SitemapNameForRobots);
 
-		#endregion properties
+        public string EnabledLanguages => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnabledLanguagesFieldName);
 
-		#region Private Methods
+        public string UseDisplayName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.UseDisplayNameFieldName);
 
-		private static string GetValueByName(string name)
+        #endregion properties
+
+        #region Private Methods
+
+        private static string GetValueByName(string name)
         {
             var result = string.Empty;
 
@@ -208,7 +194,6 @@ namespace Sitemap.XML.Models
 
             return result;
         }
-
         #endregion
     }
 }

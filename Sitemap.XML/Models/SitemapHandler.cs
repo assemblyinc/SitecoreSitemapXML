@@ -37,8 +37,8 @@ namespace Sitemap.XML.Models
 			        var sitemapManager = new SitemapManager(config);
 			        sitemapManager.SubmitSitemapToSearchenginesByHttp();
 					//removed because now the robots is generated when it is invoked the url with robots.txt at the end
-			        //if (!config.GenerateRobotsFile) continue;
-			        //sitemapManager.RegisterSitemapToRobotsFile();
+			        if (!config.GenerateRobotsFile) continue;
+			        sitemapManager.RegisterSitemapToRobotsFile();
 		        }
 	        }
 	        catch (Exception e)
