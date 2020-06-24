@@ -25,6 +25,7 @@ namespace Sitemap.XML.Models
             Id = item.ID.Guid;
             Title = item[Constants.SeoSettings.Title];
 
+            //If list of languages are not specified take all languages or else take only the languages in the list.
             var languages = item.Languages.Where(l => config.EnabledLanguageList == null ||
                                                       config.EnabledLanguageList.Contains(l.Origin.ItemId.ToString())).ToArray();
 
@@ -123,7 +124,7 @@ namespace Sitemap.XML.Models
                 options.LanguageEmbedding = LanguageEmbedding.Always;
                 options.Language = language;
 
-                Sitecore.Data.Database database = Sitecore.Configuration.Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
+                var database = Sitecore.Configuration.Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
                 item = database.GetItem(item.ID, language);
             }
 

@@ -116,13 +116,13 @@ namespace Sitemap.XML.Models
 
             foreach (var itm in items)
             {
-                doc = this.BuildSitemapItem(doc, itm, site);
+                doc = this.BuildSitemapItem(doc, itm);
             }
 
             return doc.OuterXml;
         }
 
-        private XmlDocument BuildSitemapItem(XmlDocument doc, SitemapItem item, Site site)
+        private XmlDocument BuildSitemapItem(XmlDocument doc, SitemapItem item)
         {
 	        var urlsetNode = doc.LastChild;
 
@@ -140,9 +140,9 @@ namespace Sitemap.XML.Models
                 lastmodNode.AppendChild(doc.CreateTextNode(item.LastModified));
             }
 
-            if ((item.HrefLangs != null && item.HrefLangs.Count > 0))
+            if (item.HrefLangs != null && item.HrefLangs.Count > 0)
             {
-                foreach (SitemapItemHrefLang hrefLang in item.HrefLangs)
+                foreach (var hrefLang in item.HrefLangs)
                 {
                     var xmlElement = doc.CreateElement("xhtml", "link", SitemapManagerConfiguration.XmlnsXhtmlTpl);
                     var xmlAttribute = doc.CreateAttribute("rel");
@@ -182,13 +182,12 @@ namespace Sitemap.XML.Models
             {
                 var request = string.Concat(engine, SitemapItem.HtmlEncode(sitemapUrl));
 
-                System.Net.HttpWebRequest httpRequest =
-                    (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(request);
+                System.Net.HttpWebRequest httpRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(request);
                 try
-                {
-                    System.Net.WebResponse webResponse = httpRequest.GetResponse();
+                { 
+                    var webResponse = httpRequest.GetResponse();
 
-                    System.Net.HttpWebResponse httpResponse = (System.Net.HttpWebResponse)webResponse;
+                    var httpResponse = (System.Net.HttpWebResponse)webResponse;
                     if (httpResponse.StatusCode != System.Net.HttpStatusCode.OK)
                     {
                         Log.Error(string.Format("Cannot submit sitemap to \"{0}\"", engine), this);
@@ -231,7 +230,7 @@ namespace Sitemap.XML.Models
             using (new Sitecore.Security.Accounts.UserSwitcher(user))
             {
                 descendants = contentRoot.Axes.GetDescendants()
-                    .Where(i => i[Settings.GetSetting("Sitemap.XML.Fields.ExcludeItemFromSitemap", "Exclude From Sitemap")] != "1");
+                    .Where(i => i[Constants.XmlSettings.ExcludeItemFromSitemap] != "1");
             }
 
             // getting shared content
@@ -283,7 +282,7 @@ namespace Sitemap.XML.Models
 
             var selectedModels = selected.Select(i => new SitemapItem(i, site, null, _config) ).ToList();
             selectedModels.AddRange(sharedModels);
-            selectedModels = selectedModels.OrderBy(u => u.Priority).Take(int.Parse(Settings.GetSetting("Sitemap.XML.UrlLimit", "1000"))).ToList();
+            selectedModels = selectedModels.OrderBy(u => u.Priority).Take(int.Parse(Constants.XmlSettings.UrlLimit)).ToList();
 
             var altLangModels = new List<SitemapItem>();
 

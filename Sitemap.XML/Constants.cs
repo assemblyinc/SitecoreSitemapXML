@@ -20,6 +20,12 @@ namespace Sitemap.XML
             public static string ChangeFrequency = Settings.GetSetting("Sitemap.XML.Fields.ChangeFrequency", "Change Frequency");
         }
 
+        public struct XmlSettings
+        {
+            public static string UrlLimit = Settings.GetSetting("Sitemap.XML.UrlLimit", "1000");
+            public static string ExcludeItemFromSitemap = Settings.GetSetting("Sitemap.XML.Fields.ExcludeItemFromSitemap", "Exclude From Sitemap");
+        }
+
         public struct SharedContent
         {
             public static string ParentItemFieldName = "Parent Item";
