@@ -35,25 +35,29 @@ Installation and Configuration Options
 
 1.	Install the package using the Update Installation Wizard (/sitecore/admin/updateinstallationwizard.aspx)
 2.	Open the SitemapXML.config under the App_Config\Include folder. In the SitemapXML.config file you can specify the following:
-	○ productionEnvironment - (true or false) determines whether the sitemap should be submitted to the search engines or not
-	○ Database - the database from which to pull items for generating the sitemap
-	○ sitemapConfigurationItemPath - root path for the sitemap module configuration settings
-	○ xmlnsTpl - sitemap module schema used for the XML sitemap
+    ○ xmlnsTpl - sitemap module schema used for the XML sitemap.
+	○ xmlnsXhtmlTpl - sitemap xhtml module schema used for the XML sitemap.
+	○ database - the database from which to pull items for generating the sitemap.
+	○ sitemapConfigurationItemPath - root path for the sitemap module configuration settings.
+	○ productionEnvironment - (true or false) determines whether the sitemap should be submitted to the search engines or not.
 	○ generateRobotsFile - (true or false) defines whether a robots.txt file should be auto-generated with references to sitemap files or not.
+	○ includeLastModInXml - (true or false) defines whether to include <lastmod> in the sitemap xml files or not.
 
 The following are the default values:
 ```
-<sitemapVariables>
-      <sitemapVariable name="xmlnsTpl" value="http://www.sitemaps.org/schemas/sitemap/0.9" />
-      <sitemapVariable name="database" value="master" />
-      <sitemapVariable name="sitemapConfigurationItemPath" value="/sitecore/system/Modules/Sitemap XML/" />
-      <sitemapVariable name="productionEnvironment" value="false" />
-      <sitemapVariable name="generateRobotsFile" value="true" />
-    </sitemapVariables>
+       <sitemapVariables>
+            <sitemapVariable name="xmlnsTpl" value="http://www.sitemaps.org/schemas/sitemap/0.9" />
+            <sitemapVariable name="xmlnsXhtmlTpl" value="http://www.w3.org/TR/xhtml11/xhtml11_schema.html" />
+            <sitemapVariable name="database" value="web" />
+            <sitemapVariable name="sitemapConfigurationItemPath" value="/sitecore/system/Modules/Sitemap XML/" />
+            <sitemapVariable name="productionEnvironment" value="false" />
+            <sitemapVariable name="generateRobotsFile" value="false" />
+            <sitemapVariable name="includeLastModInXml" value="false" />
+        </sitemapVariables>
 ```
 
 4.	Open the Sitecore Content Editor.
-5.	Navigate to /sitecore/content/System/modules/Sitemap XML/.
+5.	Navigate to /sitecore/system/Modules/Sitemap XML.
 6.	Create a Sitemap Configuration item and name it with the same name as the website name attribute in the <site />  definition for your website (Non-case sensitive). 
 	
 	This item will contain all of the website-specific configuration used by the module. 
@@ -64,6 +68,9 @@ The following are the default values:
 	c. Excluded Items - individual items to be excluded from the sitemap
 	d. File Name - the name of the sitemap XML file file which will be saved in the root Website directory
 	e. Server Url - the server URL to be used in the sitemap URLs. The module falls back to using the server URL which was used to request the sitemap.
+	f. Enabled Languages - select languages that sitemap URLs muls be inclued with. Leave blank to include all assigned languages.
+	g. Use Display Name - select if Display Name of the item should be used for URL generation. (Selected by default)
+	h. Enable Language Embedding - select if language should be embedded in the URL. (Selected by default)
 
 9. 	To include shared content in the sitemap add a Shared Content Definition item under the Sitemap Configuration item for the website in question and specify the Parent Item (parent content item) and Content Location (the parent item for the shared content).
 10. Sitemap will be generated and submitted after publishing (if productionEnvironment setting is set to true). Also you can submit sitemap manually. Run the Sitemap Manager application (sitecore menu/all programs/sitemap manager) and click “Refresh sitemap” button.

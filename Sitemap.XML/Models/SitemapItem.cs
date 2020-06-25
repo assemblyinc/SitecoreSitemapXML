@@ -14,38 +14,48 @@ namespace Sitemap.XML.Models
     {
         #region Constructor
 
-        public SitemapItem() {
-        }
-
-        public SitemapItem(Item item, SiteContext site, Item parentItem, SitemapManagerConfiguration config)
+        public SitemapItem(Item item, SiteContext site, Item parentItem, SitemapManagerConfiguration config,
+            Language currentLanguage = null, List<Language> allLanguages = null)
         {
-            Priority = item[Constants.SeoSettings.Priority];
-            ChangeFrequency = item[Constants.SeoSettings.ChangeFrequency].ToLower();
-            LastModified = HtmlEncode(item.Statistics.Updated.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:sszzz"));
-            Id = item.ID.Guid;
-            Title = item[Constants.SeoSettings.Title];
+            var itemId = item.ID;
+            var database = Sitecore.Configuration.Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
 
-            //If list of languages are not specified take all languages or else take only the languages in the list.
-            var languages = item.Languages.Where(l => config.EnabledLanguageList == null ||
-                                                      config.EnabledLanguageList.Contains(l.Origin.ItemId.ToString())).ToArray();
+            Id = itemId.Guid;
 
-            var siteLanguage = !string.IsNullOrWhiteSpace(site.Language) ? site.Language : languages.FirstOrDefault().Name;
+            allLanguages = allLanguages ?? item.Languages.Where(l =>
+                config.EnabledLanguageList == null ||
+                config.EnabledLanguageList.Contains(l.Origin.ItemId.ToString())).ToList();
 
-	        HrefLangs = new List<SitemapItemHrefLang>();
-            
-            foreach (var language in languages)
+            var currentLanguageName = !string.IsNullOrWhiteSpace(site.Language)
+                ? site.Language
+                : allLanguages.FirstOrDefault().Name;
+
+            currentLanguageName = currentLanguage != null ? currentLanguage.Name : currentLanguageName;
+
+            HrefLangs = new List<SitemapItemHrefLang>();
+
+            foreach (var language in allLanguages)
             {
-                var sharedItemUrl = HtmlEncode(GetItemUrl(item, site, config, language));
+                item = database.GetItem(itemId, language);
+
+                var itemUrl = HtmlEncode(GetItemUrl(item, site, config, language));
                 if (parentItem != null)
                 {
-                    sharedItemUrl = GetSharedItemUrl(item, site, parentItem, config);
+                    itemUrl = GetSharedItemUrl(item, site, parentItem, config);
                 }
 
-                Location = language.Name == siteLanguage ? sharedItemUrl : Location;
+                if (currentLanguage != null && language.Name == currentLanguage.Name)
+                {
+                    Priority = item[Constants.SeoSettings.Priority];
+                    ChangeFrequency = item[Constants.SeoSettings.ChangeFrequency].ToLower();
+                    LastModified = HtmlEncode(item.Statistics.Updated.ToLocalTime()
+                        .ToString(Constants.XmlSettings.LastmodDateFormat));
+                    Location = language.Name == currentLanguageName ? itemUrl : Location;
+                }
 
                 HrefLangs.Add(new SitemapItemHrefLang()
                 {
-                    Href = sharedItemUrl,
+                    Href = itemUrl,
                     HrefLang = language.Name
                 });
             }
@@ -60,7 +70,6 @@ namespace Sitemap.XML.Models
         public string ChangeFrequency { get; set; }
         public string Priority { get; set; }
         public Guid Id { get; set; }
-        public string Title { get; set; }
 	    public List<SitemapItemHrefLang> HrefLangs { get; set; }
 
 		#endregion
@@ -107,28 +116,42 @@ namespace Sitemap.XML.Models
 
         public static string HtmlEncode(string text)
         {
-            var result = HttpUtility.HtmlEncode(text);
-            return result;
+            return HttpUtility.HtmlEncode(text);
+        }
+
+        public static List<SitemapItem> GetLanguageSitemapItems(Item item, SiteContext site, Item parentItem, SitemapManagerConfiguration config)
+        {
+            //If list of languages are not specified take all languages or else take only the languages in the list.
+            var languages = item.Languages.Where(l =>
+                    config.EnabledLanguageList == null ||
+                    config.EnabledLanguageList.Contains(l.Origin.ItemId.ToString()))
+                .ToList();
+
+            return languages.Select(language => new SitemapItem(item, site, parentItem, config, language, languages)).ToList();
         }
 
         public static string GetItemUrl(Item item, SiteContext site, SitemapManagerConfiguration config,  Language language = null)
         {
-            var options = Sitecore.Links.UrlOptions.DefaultOptions;
+            var options = UrlOptions.DefaultOptions;
 
             options.SiteResolving = Sitecore.Configuration.Settings.Rendering.SiteResolving;
             options.Site = SiteContext.GetSite(site.Name);
             options.AlwaysIncludeServerUrl = false;
-            options.UseDisplayName = config.UseDisplayName == "1" ;
+            options.UseDisplayName = config.UseDisplayName ;
             if (language != null)
             {
-                options.LanguageEmbedding = LanguageEmbedding.Always;
+                options.LanguageEmbedding = config.EnableLanguageEmbedding? LanguageEmbedding.Always: LanguageEmbedding.Never;
                 options.Language = language;
-
-                var database = Sitecore.Configuration.Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
-                item = database.GetItem(item.ID, language);
             }
 
-			var url = Sitecore.Links.LinkManager.GetItemUrl(item, options);
+            var url = LinkManager.GetItemUrl(item, options);
+
+            //Sitecore OOTB does not use display name for the home page URLs even if configured.
+            //That needs to be corrected
+            if (item.Paths.FullPath.Equals(site.StartPath) && !url.EndsWith(item.DisplayName) && config.UseDisplayName)
+            {
+                url = string.Concat(url, url.EndsWith("/")? "": "/", item.DisplayName);
+            }
 
             var serverUrl = config.ServerUrl;
 
@@ -137,7 +160,6 @@ namespace Sitemap.XML.Models
             if (serverUrl.Contains("http://"))
             {
 				serverUrl = serverUrl.Substring("http://".Length);
-				isHttps = false;
             }
             else if (serverUrl.Contains("https://"))
             {
@@ -182,7 +204,6 @@ namespace Sitemap.XML.Models
                 }
             }
 			return sb.ToString();
-
         }
 
         #endregion

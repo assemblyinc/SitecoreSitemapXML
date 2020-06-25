@@ -22,8 +22,6 @@
 using System.Web;
 using System.Xml;
 using Sitecore.Configuration;
-using Sitecore.Data;
-using Sitecore.Data.Items;
 using Sitecore.Xml;
 using Sitecore.Diagnostics;
 using System.Linq;
@@ -59,6 +57,8 @@ namespace Sitemap.XML.Models
             }
         }
 
+        
+
         public List<string> EnabledLanguageList => !string.IsNullOrWhiteSpace(EnabledLanguages) ? EnabledLanguages.Split('|').ToList() : null;
 
         public static string XmlnsTpl => GetValueByName("xmlnsTpl");
@@ -88,7 +88,7 @@ namespace Sitemap.XML.Models
         {
             get
             {
-                string doGenerate = GetValueByName("generateRobotsFile");
+                var doGenerate = GetValueByName("generateRobotsFile");
                 return !string.IsNullOrEmpty(doGenerate) && (doGenerate.ToLower() == "true" || doGenerate == "1");
             }
         }
@@ -103,8 +103,9 @@ namespace Sitemap.XML.Models
             get
             {
                 var url =  GetValueByNameFromDatabase(Constants.WebsiteDefinition.ServerUrlFieldName);
-                return string.IsNullOrWhiteSpace(url) ? HttpContext.Current.Request.Url.Scheme+"://" 
-                    +Context.Site.Properties["hostname"] : url.Trim('/');
+                return string.IsNullOrWhiteSpace(url)
+                    ? HttpContext.Current.Request.Url.Scheme + "://" + Context.Site.Properties["hostname"]
+                    : url.Trim('/');
             }
         }
 
@@ -124,7 +125,9 @@ namespace Sitemap.XML.Models
 
         public string EnabledLanguages => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnabledLanguagesFieldName);
 
-        public string UseDisplayName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.UseDisplayNameFieldName);
+        public bool UseDisplayName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.UseDisplayNameFieldName) == "1";
+
+        public bool EnableLanguageEmbedding => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnableLanguageEmbedding) == "1";
 
         #endregion properties
 
@@ -146,12 +149,12 @@ namespace Sitemap.XML.Models
 
         private string GetValueByNameFromDatabase(string name)
         {
-            string result = string.Empty;
+            var result = string.Empty;
 
-            Database db = Factory.GetDatabase(WorkingDatabase);
+            var db = Factory.GetDatabase(WorkingDatabase);
             if (db != null)
             {
-                Item configItem = db.Items[SitemapConfigurationItemPath];
+                var configItem = db.Items[SitemapConfigurationItemPath];
                 if (configItem != null)
                 {
                     result = configItem[name];
@@ -180,7 +183,7 @@ namespace Sitemap.XML.Models
 
         public static string GetServerUrl(string siteName)
         {
-            string result = string.Empty;
+            var result = string.Empty;
 
             foreach (XmlNode node in Factory.GetConfigNodes("sitemapVariables/sites/site"))
             {

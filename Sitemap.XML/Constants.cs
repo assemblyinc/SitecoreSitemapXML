@@ -15,7 +15,6 @@ namespace Sitemap.XML
         /// </summary>
         public struct SeoSettings
         {
-            public static string Title = Settings.GetSetting("Sitemap.XML.Fields.Title", "Sitemap Title");
             public static string Priority = Settings.GetSetting("Sitemap.XML.Fields.Priority", "Priority");
             public static string ChangeFrequency = Settings.GetSetting("Sitemap.XML.Fields.ChangeFrequency", "Change Frequency");
         }
@@ -24,6 +23,7 @@ namespace Sitemap.XML
         {
             public static string UrlLimit = Settings.GetSetting("Sitemap.XML.UrlLimit", "1000");
             public static string ExcludeItemFromSitemap = Settings.GetSetting("Sitemap.XML.Fields.ExcludeItemFromSitemap", "Exclude From Sitemap");
+            public static string LastmodDateFormat = Settings.GetSetting("Sitemap.XML.LastmodDateFormat", "yyyy-MM-ddTHH:mm:sszzz");
         }
 
         public struct SharedContent
@@ -41,6 +41,7 @@ namespace Sitemap.XML
             public static string ServerUrlFieldName = "Server Url";
             public static string EnabledLanguagesFieldName = "Enabled Languages";
             public static string UseDisplayNameFieldName = "Use Display Name";
+            public static string EnableLanguageEmbedding = "Enable Language Embedding";
             public static string CleanupBucketPath = "Cleanup Bucket Path";
 	        public static string SitemapNameForRobots = "Sitemap name for Robots";
         }
