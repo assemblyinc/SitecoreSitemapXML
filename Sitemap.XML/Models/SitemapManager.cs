@@ -113,16 +113,15 @@ namespace Sitemap.XML.Models
 
 			doc.AppendChild(urlsetNode);
 
-
             foreach (var itm in items)
             {
-                doc = this.BuildSitemapItem(doc, itm, site);
+                doc = BuildSitemapItem(doc, itm);
             }
 
             return doc.OuterXml;
         }
 
-        private XmlDocument BuildSitemapItem(XmlDocument doc, SitemapItem item, Site site)
+        private XmlDocument BuildSitemapItem(XmlDocument doc, SitemapItem item)
         {
 	        var urlsetNode = doc.LastChild;
 
@@ -140,9 +139,9 @@ namespace Sitemap.XML.Models
                 lastmodNode.AppendChild(doc.CreateTextNode(item.LastModified));
             }
 
-            if ((item.HrefLangs != null && item.HrefLangs.Count > 0))
+            if (item.HrefLangs != null && item.HrefLangs.Count > 0)
             {
-                foreach (SitemapItemHrefLang hrefLang in item.HrefLangs)
+                foreach (var hrefLang in item.HrefLangs)
                 {
                     var xmlElement = doc.CreateElement("xhtml", "link", SitemapManagerConfiguration.XmlnsXhtmlTpl);
                     var xmlAttribute = doc.CreateAttribute("rel");
@@ -182,13 +181,12 @@ namespace Sitemap.XML.Models
             {
                 var request = string.Concat(engine, SitemapItem.HtmlEncode(sitemapUrl));
 
-                System.Net.HttpWebRequest httpRequest =
-                    (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(request);
+                var httpRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(request);
                 try
-                {
-                    System.Net.WebResponse webResponse = httpRequest.GetResponse();
+                { 
+                    var webResponse = httpRequest.GetResponse();
 
-                    System.Net.HttpWebResponse httpResponse = (System.Net.HttpWebResponse)webResponse;
+                    var httpResponse = (System.Net.HttpWebResponse)webResponse;
                     if (httpResponse.StatusCode != System.Net.HttpStatusCode.OK)
                     {
                         Log.Error(string.Format("Cannot submit sitemap to \"{0}\"", engine), this);
@@ -210,7 +208,7 @@ namespace Sitemap.XML.Models
             var items = GetSitemapItems(rootPath);
 
             var fullPath = MainUtil.MapPath(string.Concat("/", _config.FileName));
-            var xmlContent = this.BuildSitemapXML(items, site);
+            var xmlContent = BuildSitemapXML(items, site);
 
             var strWriter = new StreamWriter(fullPath, false);
             strWriter.Write(xmlContent);
@@ -224,18 +222,21 @@ namespace Sitemap.XML.Models
 
             var database = Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
 
+            //Get the content root item
             var contentRoot = database.Items[rootPath];
 
+            //Get the descendents of the content root
             IEnumerable<Item> descendants;
-            Sitecore.Security.Accounts.User user = Sitecore.Security.Accounts.User.FromName(Constants.SitemapParserUser, true);
+            var user = Sitecore.Security.Accounts.User.FromName(Constants.SitemapParserUser, true);
             using (new Sitecore.Security.Accounts.UserSwitcher(user))
             {
                 descendants = contentRoot.Axes.GetDescendants()
-                    .Where(i => i[Settings.GetSetting("Sitemap.XML.Fields.ExcludeItemFromSitemap", "Exclude From Sitemap")] != "1");
+                    .Where(i => i[Constants.XmlSettings.ExcludeItemFromSitemap] != "1");
             }
 
             // getting shared content
-            var sharedModels = new List<SitemapItem>();
+            //TODO: Unverified and un-tested. Might need some modifications before it can be used.
+            var sharedModels = new List<List<SitemapItem>>();
             var sharedDefinitions = Db.SelectItems(string.Format("fast:{0}/*", _config.SitemapConfigurationItemPath).Replace("-","#-#"));
             var site = Factory.GetSite(_config.SiteName);
             var enabledTemplates = BuildListFromString(disTpls, '|');
@@ -269,53 +270,44 @@ namespace Sitemap.XML.Models
                                          where itm.Template != null && enabledTemplates.Select(t => t.ToLower()).Contains(itm.Template.ID.ToString().ToLower())
                                                                     && !excludeItems.Contains(itm.ID.ToString())
                                          select itm;
-                var sharedSitemapItems = cleanedSharedItems.Select(i => new SitemapItem(i, site, parentItem, _config));
+                var sharedSitemapItems = cleanedSharedItems.Select(i => SitemapItem.GetLanguageSitemapItems(i, site, parentItem, _config));
                 sharedModels.AddRange(sharedSitemapItems);
             }
 
-            var sitemapItems = descendants.ToList();
-            sitemapItems.Insert(0, contentRoot);
+            //All content items
+            var contentItems = descendants.ToList();
+            contentItems.Insert(0, contentRoot);
 
-            var selected = from itm in sitemapItems
-                           where itm.Template != null && enabledTemplates.Contains(itm.Template.ID.ToString())
-								 && !excludeItems.Contains(itm.ID.ToString())
-                           select itm;
+            //Filter out the content items that belongs to Sitemap Configuration Manager
+            //Should belong to enabled templates
+            //Should not be an excluded item
+            var selected = from itm in contentItems
+                where itm.Template != null && enabledTemplates.Contains(itm.Template.ID.ToString()) &&
+                      !excludeItems.Contains(itm.ID.ToString())
+                select itm;
 
-            var selectedModels = selected.Select(i => new SitemapItem(i, site, null, _config) ).ToList();
-            selectedModels.AddRange(sharedModels);
-            selectedModels = selectedModels.OrderBy(u => u.Priority).Take(int.Parse(Settings.GetSetting("Sitemap.XML.UrlLimit", "1000"))).ToList();
+            //Get sitemap items in Language blocks per item
+            var languageSitemapItems = selected.Select(i => SitemapItem.GetLanguageSitemapItems(i, site, null, _config)).ToList();
 
-            var altLangModels = new List<SitemapItem>();
+            //Final list of sitamap items
+            var sitemapItems = new List<SitemapItem>();
 
-            if (selectedModels.Any())
+            //Adding shared items to the sitemap items list
+            foreach (var sharedModel in sharedModels)
             {
-                foreach (var selectedModel in selectedModels)
-                {
-                    if (selectedModel.HrefLangs.Count > 1)
-                    {
-                        foreach (var hrefLang in selectedModel.HrefLangs)
-                        {
-                            if (hrefLang.Href != selectedModel.Location)
-                            {
-                                altLangModels.Add(new SitemapItem
-                                {
-                                    Location = hrefLang.Href,
-                                    LastModified = selectedModel.LastModified,
-                                    ChangeFrequency = selectedModel.ChangeFrequency,
-                                    Priority = selectedModel.Priority,
-                                    Id = selectedModel.Id,
-                                    Title = selectedModel.Title,
-                                    HrefLangs = selectedModel.HrefLangs
-                                });
-                            }
-                        }
-                    }
-
-                }
-                selectedModels.AddRange(altLangModels);
+                sitemapItems.AddRange(sharedModel);
             }
 
-            return selectedModels;
+            //Adding language specific sitemap items to the sitemap items list
+            foreach (var laguageSitemapItem in languageSitemapItems)
+            {
+                sitemapItems.AddRange(laguageSitemapItem);
+            }
+
+            //Order the items based on priority in descending order with a cap of max items
+            sitemapItems = sitemapItems.OrderByDescending(u => u.Priority).Take(int.Parse(Constants.XmlSettings.UrlLimit)).ToList();
+
+            return sitemapItems;
         }
 
         private static List<string> BuildListFromString(string str, char separator)
@@ -431,11 +423,11 @@ namespace Sitemap.XML.Models
             if (sitemapConfig != null)
             {
                 //TODO: URL
-                string engines = sitemapConfig.Fields[Constants.WebsiteDefinition.SearchEnginesFieldName].Value;
+                var engines = sitemapConfig.Fields[Constants.WebsiteDefinition.SearchEnginesFieldName].Value;
                 var filePath = !_config.ServerUrl.EndsWith("/")
                             ? _config.ServerUrl + "/" + _config.FileName
                             : _config.ServerUrl + _config.FileName;
-                foreach (string id in engines.Split('|'))
+                foreach (var id in engines.Split('|'))
                 {
                     var engine = Db.Items[id];
                     if (engine != null)
