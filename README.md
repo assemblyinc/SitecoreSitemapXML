@@ -25,9 +25,8 @@ Using the Source -
 Publish the project directly into the \Website folder of the Sitecore instance and Deploy the TDS Master and Core project content.
 
 Using the Module - 
-1. [Download the Ultimate Sitemap XML module from Sitecore Marketplace](https://marketplace.sitecore.net/Modules/U/Ultimate_Sitemap_XML.aspx) 
-2. Install the module using the Sitecore Installation Wizard.
-3. 
+1. [Download the Sitemap XML module](https://github.com/climax-media/SitecoreSitemapXML/blob/master/Sitemap.XML.Package/SitemapXMLPackages-1.0.zip) 
+2. Install the module using the Sitecore Installation Wizard. 
 
 Installation and Configuration Options
 ------------------------------------------
