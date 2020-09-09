@@ -27,6 +27,7 @@ Publish the project directly into the \Website folder of the Sitecore instance a
 Using the Module - 
 1. [Download the Sitemap XML module](https://github.com/climax-media/SitecoreSitemapXML/blob/master/Sitemap.XML.Package/SitemapXMLPackages-1.0.zip) 
 2. Install the module using the Sitecore Installation Wizard. 
+3. Copy `SitemapXML.config` _(/webroot/App_Config/Include/)_ and `SitemapXMl.dll` _(/webroot/bin/)_ files from CM to corresponding location on CD
 
 Installation and Configuration Options
 ------------------------------------------
