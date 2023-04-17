@@ -11,16 +11,18 @@
     }
     var root = Sitecore.Context.Database.GetItem(Sitecore.Context.Site.StartPath);
     var count = 0;
+    var smConfig = new SitemapManagerConfiguration(Sitecore.Context.Site.Name);
+
     <div class="sitemap">
         <ul>
-            <li><a href="@SitemapItem.GetItemUrl(root, Sitecore.Context.Site)">@root[Constants.SeoSettings.Title]</a>
-            @RecursiveSitemap(root, count)
+            <li><a href="@SitemapItem.GetItemUrl(root, Sitecore.Context.Site, smConfig)">@root[Constants.SeoSettings.Title]</a>
+            @RecursiveSitemap(root, count, smConfig)
             </li>
         </ul>
     </div>
 }
 
-@helper RecursiveSitemap(Item parentItem, int count)
+@helper RecursiveSitemap(Item parentItem, int count, SitemapManagerConfiguration smConfig)
 {
     if (count >= int.Parse(Sitecore.Configuration.Settings.GetSetting("Sitemap.XML.UrlLimit", "1000")))
     {
@@ -44,8 +46,8 @@
         {
             @:<li>
             <a href="@(SM.IsChildUnderSharedLocation(localChild) ? 
-                SitemapItem.GetSharedItemUrl(localChild, Sitecore.Context.Site) 
-                : SitemapItem.GetItemUrl(localChild, Sitecore.Context.Site))">@localChild[Constants.SeoSettings.Title]</a>
+                SitemapItem.GetSharedItemUrl(localChild, Sitecore.Context.Site, smConfig) 
+                : SitemapItem.GetItemUrl(localChild, Sitecore.Context.Site, smConfig))">@localChild[Constants.SeoSettings.Title]</a>
         }
         if (SM.IsShared(localChild))
         {
@@ -53,7 +55,7 @@
         }
         if (localChild.Children.Count != 0)
         {
-            @RecursiveSitemap(localChild, count)
+            @RecursiveSitemap(localChild, count, smConfig)
         }
         if (SM.IsEnabledTemplate(localChild) && !SM.IsExcludedItem(localChild))
         {

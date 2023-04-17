@@ -57,8 +57,6 @@ namespace Sitemap.XML.Models
             }
         }
 
-        
-
         public List<string> EnabledLanguageList => !string.IsNullOrWhiteSpace(EnabledLanguages) ? EnabledLanguages.Split('|').ToList() : null;
 
         public static string XmlnsTpl => GetValueByName("xmlnsTpl");
@@ -94,6 +92,7 @@ namespace Sitemap.XML.Models
         }
 
         public string EnabledTemplates => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnabledTemplatesFieldName);
+
 	    public string ExcludedItems => GetValueByNameFromDatabase(Constants.WebsiteDefinition.ExcludedItemsFieldName);
 
         public bool CleanupBucketPath => GetValueByNameFromDatabase(Constants.WebsiteDefinition.CleanupBucketPath) == "1";
@@ -121,6 +120,7 @@ namespace Sitemap.XML.Models
         public string SiteName { get; } = string.Empty;
 
         public string FileName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.FileNameFieldName);
+
         public string SitemapNameForRobots => GetValueByNameFromDatabase(Constants.WebsiteDefinition.SitemapNameForRobots);
 
         public string EnabledLanguages => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnabledLanguagesFieldName);

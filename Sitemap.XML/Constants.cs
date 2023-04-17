@@ -15,6 +15,7 @@ namespace Sitemap.XML
         /// </summary>
         public struct SeoSettings
         {
+            public static string Title = Settings.GetSetting("Sitemap.XML.Fields.Title", "Sitemap Title");
             public static string Priority = Settings.GetSetting("Sitemap.XML.Fields.Priority", "Priority");
             public static string ChangeFrequency = Settings.GetSetting("Sitemap.XML.Fields.ChangeFrequency", "Change Frequency");
         }
@@ -43,10 +44,10 @@ namespace Sitemap.XML
             public static string UseDisplayNameFieldName = "Use Display Name";
             public static string EnableLanguageEmbedding = "Enable Language Embedding";
             public static string CleanupBucketPath = "Cleanup Bucket Path";
-	        public static string SitemapNameForRobots = "Sitemap name for Robots";
+            public static string SitemapNameForRobots = "Sitemap name for Robots";
         }
 
-		public static string SitemapParserUser = @"extranet\Anonymous";
+        public static string SitemapParserUser = @"extranet\Anonymous";
         public static string SitemapModuleSettingsRootItemId = "{6003D67E-0000-4A4D-BFB1-11408B9ADCFD}";
         public static string RobotsFileName = "robots.txt";
         public static string SitemapSubmissionUriFieldName = "Sitemap Submission Uri";

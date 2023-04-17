@@ -173,6 +173,7 @@ $RECYCLE.BIN/
 #Sublime settings
 thejames.sublime-workspace
 thejames.sublime-project
+.vs
 /.vs/config
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json

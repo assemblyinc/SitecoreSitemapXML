@@ -70,13 +70,13 @@ namespace Sitemap.XML.Models
         public string ChangeFrequency { get; set; }
         public string Priority { get; set; }
         public Guid Id { get; set; }
-	    public List<SitemapItemHrefLang> HrefLangs { get; set; }
+        public List<SitemapItemHrefLang> HrefLangs { get; set; }
 
-		#endregion
+        #endregion
 
-		#region Private Methods
+        #region Private Methods
 
-		private static string GetSharedItemUrl(Item item, SiteContext site, Item parentItem, SitemapManagerConfiguration config)
+        private static string GetSharedItemUrl(Item item, SiteContext site, Item parentItem, SitemapManagerConfiguration config)
         {
             var itemUrl = HtmlEncode(GetItemUrl(item, site, config));
             var parentUrl = HtmlEncode(GetItemUrl(parentItem, site, config));
@@ -102,7 +102,7 @@ namespace Sitemap.XML.Models
         public static string GetSharedItemUrl(Item item, SiteContext site, SitemapManagerConfiguration config)
         {
             var parentItem = SitemapManager.GetSharedLocationParent(item);
-			var itemUrl = HtmlEncode(GetItemUrl(item, site, config));
+            var itemUrl = HtmlEncode(GetItemUrl(item, site, config));
             var parentUrl = HtmlEncode(GetItemUrl(parentItem, site, config));
             parentUrl = parentUrl.EndsWith("/") ? parentUrl : parentUrl + "/";
             var pos = itemUrl.LastIndexOf("/") + 1;
@@ -132,8 +132,8 @@ namespace Sitemap.XML.Models
 
         public static string GetItemUrl(Item item, SiteContext site, SitemapManagerConfiguration config,  Language language = null)
         {
-            var options = UrlOptions.DefaultOptions;
-
+            var options = LinkManager.GetDefaultUrlBuilderOptions();
+            
             options.SiteResolving = Sitecore.Configuration.Settings.Rendering.SiteResolving;
             options.Site = SiteContext.GetSite(site.Name);
             options.AlwaysIncludeServerUrl = false;
@@ -159,13 +159,13 @@ namespace Sitemap.XML.Models
             
             if (serverUrl.Contains("http://"))
             {
-				serverUrl = serverUrl.Substring("http://".Length);
+                serverUrl = serverUrl.Substring("http://".Length);
             }
             else if (serverUrl.Contains("https://"))
             {
-				serverUrl = serverUrl.Substring("https://".Length);
-				isHttps = true;
-			}
+                serverUrl = serverUrl.Substring("https://".Length);
+                isHttps = true;
+            }
 
             var sb = new StringBuilder();
 
@@ -193,7 +193,7 @@ namespace Sitemap.XML.Models
             }
             else
             {
-				if (url.Contains("://") && !url.Contains("http"))
+                if (url.Contains("://") && !url.Contains("http"))
                 {
                     sb.Append(isHttps ? "https://" : "http://");
                     sb.Append(url);
@@ -203,7 +203,7 @@ namespace Sitemap.XML.Models
                     sb.Append(Sitecore.Web.WebUtil.GetFullUrl(url));
                 }
             }
-			return sb.ToString();
+            return sb.ToString();
         }
 
         #endregion
