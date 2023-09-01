@@ -36,7 +36,7 @@ Installation and Configuration Options
 2. Open the `SitemapXML.config` under the `App_Config\Include` folder. In the `SitemapXML.config` file you can specify the following:
    - `xmlnsTpl` - sitemap module schema used for the XML sitemap.
    - `xmlnsXhtmlTpl` - sitemap xhtml module schema used for the XML sitemap.
-   - `database` - the database from which to pull items for generating the sitemap.
+   - `database` - the database from which to pull items for generating the sitemap. `web` for CD and `master` for CM/Standalone.
    - `sitemapConfigurationItemPath` - root path for the sitemap module configuration settings.
    - `productionEnvironment` - (true or false) determines whether the sitemap should be submitted to the search engines or not.
    - `generateRobotsFile` - (true or false) defines whether a `robots.txt` file should be auto-generated with references to sitemap files or not.
@@ -51,7 +51,7 @@ The following are the default values:
             <sitemapVariable name="sitemapConfigurationItemPath" value="/sitecore/system/Modules/Sitemap XML/" />
             <sitemapVariable name="productionEnvironment" value="false" />
             <sitemapVariable name="generateRobotsFile" value="false" />
-            <sitemapVariable name="includeLastModInXml" value="false" />
+            <sitemapVariable name="includeLastModInXml" value="true" />
         </sitemapVariables>
 ```
 
@@ -68,9 +68,9 @@ The following are the default values:
     - `File Name` - the name of the sitemap XML file file which will be saved in the root Website directory
     - `Server Url` - the server URL to be used in the sitemap URLs. The module falls back to using the server URL which was used to request the sitemap.
     - `Enabled Languages` - select languages that sitemap URLs muls be inclued with. Leave blank to include all assigned languages.
-    - `Use Display Name` - select if Display Name of the item should be used for URL generation. (Selected by default)
-    - `Enable Language Embedding` - select if language should be embedded in the URL. (Selected by default)
+    - `Use Display Name For Home Page` - select if Display Name should be used for the Home page URL generation.
+    - `Disable Language Embedding` - select if language should not be embedded in the URL.
 
 9.  To include shared content in the sitemap add a `Shared Content Definition` item under the `Sitemap Configuration` item for the website in question and specify the `Parent Item` (parent content item) and `Content Location` (the parent item for the shared content).
-10. Sitemap will be generated and submitted to defined search engines after publishing (if `productionEnvironment` setting is set to `true`). Also you can submit sitemap manually. Run the `Sitemap Manager` application (`sitecore menu/all programs/sitemap manager`) and click `Refresh sitemap` button.
+10. Sitemap will be generated and submitted to defined search engines after publishing (if `productionEnvironment` setting is set to `true`). ~~Also you can submit sitemap manually. Run the `Sitemap Manager` application (`sitecore menu/all programs/sitemap manager`) and click `Refresh sitemap` button.~~
 

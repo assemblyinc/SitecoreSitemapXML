@@ -125,9 +125,9 @@ namespace Sitemap.XML.Models
 
         public string EnabledLanguages => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnabledLanguagesFieldName);
 
-        public bool UseDisplayName => GetValueByNameFromDatabase(Constants.WebsiteDefinition.UseDisplayNameFieldName) == "1";
+        public bool UseDisplayNameForHomePage => GetValueByNameFromDatabase(Constants.WebsiteDefinition.UseDisplayNameForHomePageFieldName) == "1";
 
-        public bool EnableLanguageEmbedding => GetValueByNameFromDatabase(Constants.WebsiteDefinition.EnableLanguageEmbedding) == "1";
+        public bool DisableLanguageEmbedding => GetValueByNameFromDatabase(Constants.WebsiteDefinition.DisableLanguageEmbeddingFieldName) == "1";
 
         #endregion properties
 

@@ -28,23 +28,32 @@ namespace Sitemap.XML.Models
     {
         public void RefreshSitemap(object sender, EventArgs args)
         {
-	        try
-	        {
-		        var sites = SitemapManagerConfiguration.GetSiteNames();
-		        foreach (var site in sites)
-		        {
-			        var config = new SitemapManagerConfiguration(site);
-			        var sitemapManager = new SitemapManager(config);
-			        sitemapManager.SubmitSitemapToSearchenginesByHttp();
-					//removed because now the robots is generated when it is invoked the url with robots.txt at the end
-			        if (!config.GenerateRobotsFile) continue;
-			        sitemapManager.RegisterSitemapToRobotsFile();
-		        }
-	        }
-	        catch (Exception e)
-	        {
-		        Log.Error("Error Sitemap",e,this);
-	        }
+            try
+            {
+                var sites = SitemapManagerConfiguration.GetSiteNames();
+
+                if (sites == null)
+                {
+                    Log.Error("Error Sitemap:SitemapHandler.RefreshSitemap:No Sites had been configured at '/sitecore/system/Modules/Sitemap XML'", this);
+                }
+                else
+                {
+                    Log.Info("Error Sitemap:SitemapHandler.RefreshSitemap: At least one Sitemap Site is found at '/sitecore/system/Modules/Sitemap XML'", this);
+                    foreach (var site in sites)
+                    {
+                        var config = new SitemapManagerConfiguration(site);
+                        var sitemapManager = new SitemapManager(config);
+                        sitemapManager.SubmitSitemapToSearchenginesByHttp();
+                        //removed because now the robots is generated when it is invoked the url with robots.txt at the end
+                        if (!config.GenerateRobotsFile) continue;
+                        sitemapManager.RegisterSitemapToRobotsFile();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error Sitemap",e,this);
+            }
         }
     }
 }

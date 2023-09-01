@@ -41,8 +41,8 @@ namespace Sitemap.XML
             public static string FileNameFieldName = "File Name";
             public static string ServerUrlFieldName = "Server Url";
             public static string EnabledLanguagesFieldName = "Enabled Languages";
-            public static string UseDisplayNameFieldName = "Use Display Name";
-            public static string EnableLanguageEmbedding = "Enable Language Embedding";
+            public static string UseDisplayNameForHomePageFieldName = "Use Display Name For Home Page";
+            public static string DisableLanguageEmbeddingFieldName = "Disable Language Embedding";
             public static string CleanupBucketPath = "Cleanup Bucket Path";
             public static string SitemapNameForRobots = "Sitemap name for Robots";
         }

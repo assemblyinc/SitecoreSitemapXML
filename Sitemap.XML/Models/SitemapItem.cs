@@ -137,10 +137,10 @@ namespace Sitemap.XML.Models
             options.SiteResolving = Sitecore.Configuration.Settings.Rendering.SiteResolving;
             options.Site = SiteContext.GetSite(site.Name);
             options.AlwaysIncludeServerUrl = false;
-            options.UseDisplayName = config.UseDisplayName ;
+            options.UseDisplayName = true;
             if (language != null)
             {
-                options.LanguageEmbedding = config.EnableLanguageEmbedding? LanguageEmbedding.Always: LanguageEmbedding.Never;
+                options.LanguageEmbedding = config.DisableLanguageEmbedding? LanguageEmbedding.Never: LanguageEmbedding.Always;
                 options.Language = language;
             }
 
@@ -148,10 +148,13 @@ namespace Sitemap.XML.Models
 
             //Sitecore OOTB does not use display name for the home page URLs even if configured.
             //That needs to be corrected
-            if (item.Paths.FullPath.Equals(site.StartPath) && !url.EndsWith(item.DisplayName) && config.UseDisplayName)
+            if (item.Paths.FullPath.Equals(site.StartPath) && !url.EndsWith(item.DisplayName) && config.UseDisplayNameForHomePage)
             {
                 url = string.Concat(url, url.EndsWith("/")? "": "/", item.DisplayName);
             }
+
+            //Remove the trailing `/` from the URL 
+            url = url.TrimEnd(new[] { '/' });
 
             var serverUrl = config.ServerUrl;
 
