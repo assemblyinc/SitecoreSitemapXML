@@ -34,11 +34,11 @@ namespace Sitemap.XML.Models
 
                 if (sites == null)
                 {
-                    Log.Error("Error Sitemap:SitemapHandler.RefreshSitemap:No Sites had been configured at '/sitecore/system/Modules/Sitemap XML'", this);
+                    Log.Warn("SitemapXML:SitemapHandler.RefreshSitemap:No Sites had been configured at '/sitecore/system/Modules/Sitemap XML'", this);
                 }
                 else
                 {
-                    Log.Info("Error Sitemap:SitemapHandler.RefreshSitemap: At least one Sitemap Site is found at '/sitecore/system/Modules/Sitemap XML'", this);
+                    Log.Info("SitemapXML:SitemapHandler.RefreshSitemap: At least one Sitemap Site is found at '/sitecore/system/Modules/Sitemap XML'", this);
                     foreach (var site in sites)
                     {
                         var config = new SitemapManagerConfiguration(site);
@@ -52,7 +52,7 @@ namespace Sitemap.XML.Models
             }
             catch (Exception e)
             {
-                Log.Error("Error Sitemap",e,this);
+                Log.Error("SitemapXML:",e,this);
             }
         }
     }
