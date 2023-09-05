@@ -46,7 +46,7 @@ The following are the default values:
 ```
        <sitemapVariables>
             <sitemapVariable name="xmlnsTpl" value="http://www.sitemaps.org/schemas/sitemap/0.9" />
-            <sitemapVariable name="xmlnsXhtmlTpl" value="http://www.w3.org/TR/xhtml11/xhtml11_schema.html" />
+            <sitemapVariable name="xmlnsXhtmlTpl" value="http://www.w3.org/1999/xhtml" />
             <sitemapVariable name="database" value="web" />
             <sitemapVariable name="sitemapConfigurationItemPath" value="/sitecore/system/Modules/Sitemap XML/" />
             <sitemapVariable name="productionEnvironment" value="false" />
