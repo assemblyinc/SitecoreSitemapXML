@@ -39,6 +39,7 @@ namespace Sitemap.XML.Models
                 RefreshButton.Click = "RefreshButtonClick";
             }
         }
+
         protected void RefreshButtonClick()
         {
             var sh = new SitemapHandler();

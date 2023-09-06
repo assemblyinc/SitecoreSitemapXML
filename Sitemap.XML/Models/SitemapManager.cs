@@ -107,11 +107,11 @@ namespace Sitemap.XML.Models
             xmlnsAttr.Value = SitemapManagerConfiguration.XmlnsTpl;
             urlsetNode.Attributes.Append(xmlnsAttr);
 
-	        var xmlnsXhtmlTpl = doc.CreateAttribute("xmlns:xhtml");
-	        xmlnsXhtmlTpl.Value = SitemapManagerConfiguration.XmlnsXhtmlTpl;
-	        urlsetNode.Attributes.Append(xmlnsXhtmlTpl);
+            var xmlnsXhtmlTpl = doc.CreateAttribute("xmlns:xhtml");
+            xmlnsXhtmlTpl.Value = SitemapManagerConfiguration.XmlnsXhtmlTpl;
+            urlsetNode.Attributes.Append(xmlnsXhtmlTpl);
 
-			doc.AppendChild(urlsetNode);
+            doc.AppendChild(urlsetNode);
 
             foreach (var itm in items)
             {
@@ -123,7 +123,7 @@ namespace Sitemap.XML.Models
 
         private XmlDocument BuildSitemapItem(XmlDocument doc, SitemapItem item)
         {
-	        var urlsetNode = doc.LastChild;
+            var urlsetNode = doc.LastChild;
 
             XmlNode urlNode = doc.CreateElement("url");
             urlsetNode.AppendChild(urlNode);
@@ -218,7 +218,7 @@ namespace Sitemap.XML.Models
         private List<SitemapItem> GetSitemapItems(string rootPath)
         {
             var disTpls = _config.EnabledTemplates;
-	        var excludeItemsField = _config.ExcludedItems;
+            var excludeItemsField = _config.ExcludedItems;
 
             var database = Factory.GetDatabase(SitemapManagerConfiguration.WorkingDatabase);
 
@@ -383,8 +383,8 @@ namespace Sitemap.XML.Models
 
         public static bool IsExcludedItem(Item item)
         {
-	        var config = new SitemapManagerConfiguration(Context.GetSiteName());
-	        return config.ExcludedItems.ToLower().Contains(item.ID.ToGuid().ToString());
+            var config = new SitemapManagerConfiguration(Context.GetSiteName());
+            return config.ExcludedItems.ToLower().Contains(item.ID.ToGuid().ToString());
         }
 
         public static bool ContainsItemsToShow(IEnumerable<Item> items)
@@ -448,20 +448,19 @@ namespace Sitemap.XML.Models
             var robotsPath = MainUtil.MapPath(string.Concat("/", Constants.RobotsFileName));
             var sitemapContent = new StringBuilder(string.Empty);
             
-
             if (File.Exists(robotsPath))
             {
-	            var sr = new StreamReader(robotsPath);
-	            sitemapContent.Append(sr.ReadToEnd());
-	            sr.Close();
+                var sr = new StreamReader(robotsPath);
+                sitemapContent.Append(sr.ReadToEnd());
+                sr.Close();
             }
             else
             {
-	            sitemapContent.AppendLine("User-agent: *");
-	            sitemapContent.AppendLine("Disallow:");
-			}
+                sitemapContent.AppendLine("User-agent: *");
+                sitemapContent.AppendLine("Disallow:");
+            }
 
-			var sw = new StreamWriter(robotsPath, false);
+            var sw = new StreamWriter(robotsPath, false);
             var sitemapUrl = _config.ServerUrl + "/" + _config.FileName;
             var sitemapLine = string.Concat("Sitemap: ", sitemapUrl);
             if (!sitemapContent.ToString().Contains(sitemapLine))
@@ -472,20 +471,19 @@ namespace Sitemap.XML.Models
             sw.Close();
         }
 
-	    public string GetRobotSite()
-	    {
-		    var sitemapContent = new StringBuilder(string.Empty);
-		    sitemapContent.AppendLine("User-agent: *");
-		    sitemapContent.AppendLine("Disallow:");
-		    var sitemapUrl = _config.ServerUrl + "/" + _config.SitemapNameForRobots;
-		    var sitemapLine = string.Concat("Sitemap: ", sitemapUrl);
-		    if (!sitemapContent.ToString().Contains(sitemapLine))
-		    {
-			    sitemapContent.AppendLine(sitemapLine);
-		    }
-		    return sitemapContent.ToString();
-	    }
-
-	    #endregion
+        public string GetRobotSite()
+        {
+            var sitemapContent = new StringBuilder(string.Empty);
+            sitemapContent.AppendLine("User-agent: *");
+            sitemapContent.AppendLine("Disallow:");
+            var sitemapUrl = _config.ServerUrl + "/" + _config.SitemapNameForRobots;
+            var sitemapLine = string.Concat("Sitemap: ", sitemapUrl);
+            if (!sitemapContent.ToString().Contains(sitemapLine))
+            {
+                sitemapContent.AppendLine(sitemapLine);
+            }
+            return sitemapContent.ToString();
+        }
+        #endregion
     }
 }
